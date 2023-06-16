@@ -1,5 +1,5 @@
 import os
-
+import unittest
 
 import selenium
 from selenium import webdriver
@@ -30,20 +30,25 @@ import pdfkit
 # desktop notification
 from plyer import notification
 
-options = Options()
-options.add_experimental_option('detach', True)
-# creating an  instance of the webdriver
-driver = webdriver.Chrome(options=options)
+class Login(unittest.TestCase):
+    def setUp(self):
+        self.options = Options()
+        options.add_experimental_option('detach', True)
+        # creating an  instance of the webdriver
+        self.driver = webdriver.Chrome(options=options)
+        self.base_url = 'https:// robotsparebinindustries.com/'
+        self.robospare_user=os.environ.get('robospare_user')
+        self.robospare_pass=os.environ.get('robospare_pass')
+        self.driver.implicitly_wait(10)
 
-
-def sign_in(driver=driver):
+    def test_sign_in(self):
     # opening the website
+    driver=self.driver
     driver.get('https://robotsparebinindustries.com/')
     # environment variables
-    robospare_user = os.environ.get('robospare_user')
-    robospare_pass = os.environ.get('robospare_pass')
+    
 
-    driver.implicitly_wait(10)
+   
 
     # Indentify fields
     username_field = driver.find_element(By.ID, 'username')
@@ -55,11 +60,11 @@ def sign_in(driver=driver):
     driver.implicitly_wait(10)
     # enter info on fields
     username_field.send_keys(str(robospare_user))
-    driver.implicitly_wait(10)
+    
     password_field.send_keys(str(robospare_pass))
     button_click = login_button.click()
 
-    driver.implicitly_wait(50)
+    
 
 
 def create_directory():
