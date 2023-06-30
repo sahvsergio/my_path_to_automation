@@ -131,6 +131,23 @@ def sales_to_pdf():
     sales_table = driver.find_element(
         By.XPATH, '//*[@id="sales-results"]/table')
     table_html = sales_table.get_attribute('outerHTML')
+    table_header = driver.find_elements(By.XPATH,'//*[@id="sales-results"]/table/thead/tr/th')
+    print(type(table_header))
+    table_header_text=[]
+    
+    for  header_title in table_header:
+        header_title_text=header_title.text
+        table_header_text.append(header_title_text)
+        
+    print(table_header_text)       
+    
+    #create df
+    df=pd.DataFrame(columns=table_header_text)
+    print(df)
+
+    
+    
+   
 
     # writing table_html to an html file
     with open('table.html', 'w') as f:
@@ -237,15 +254,15 @@ def log_out(driver=driver):
     notification.notify(title='Sales Completed', message='All orders have been completed',
                         timeout=10)
 
-
-# paautopep8sign_in()
+sign_in()
 create_directory()
-# enter_sales()
-# sales_screenshot()
-# sales_to_pdf()
-download_orders_file()
-get_order_page()
-create_orders()
+enter_sales()
+sales_screenshot()
+sales_to_pdf()
+#download_orders_file()
+#get_order_page()
+#
+# create_orders()
 # log_out()
 
 """
