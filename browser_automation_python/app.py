@@ -22,7 +22,7 @@ import requests
 
 # read data in tables
 import pandas as pd
-#read data in  regular html
+# read data in  regular html
 from bs4 import BeautifulSoup
 # transform  into pdf
 import pdfkit
@@ -179,80 +179,55 @@ def create_orders():
 
     # body field
     body_fields = driver.find_elements(By.CSS_SELECTOR, '.form-check-input')
-    
-    #legs field
+
+    # legs field
     legs_field = driver.find_element(
         By.XPATH, '/html/body/div/div/div[1]/div/div[1]/form/div[3]/input')
-    
+
     # address
-    address_field=driver.find_element(By.ID,'address')
-    #preview button 
-    preview_button=driver.find_element(By.ID, 'preview')
+    address_field = driver.find_element(By.ID, 'address')
+    # preview button
+    preview_button = driver.find_element(By.ID, 'preview')
     order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
-   
-    
 
     # fill out the order
-    
+
     for head, body_type, legs, address in zip(csv_df['Head'], csv_df['Body'], csv_df['Legs'], csv_df['Legs']):
-        
+
         driver.implicitly_wait(10)
-        
+
         select_head.select_by_value(str(head))
         for field in body_fields:
             field = field
             if field.get_attribute('value') == str(body_type):
                 field.click()
-            
-            
+
         legs_field.send_keys(legs)
-        address_field.send_keys(address) 
-        #preview robot
-        
+        address_field.send_keys(address)
+        # preview robot
+
         preview_button.click()
-        #show order
-        order_butotn=driver.find_element(By.ID, 'order')
+        # show order
+        order_butotn = driver.find_element(By.ID, 'order')
         order_button.click()
-        
-        
-        
-        #html receipt
-        receipt=driver.find_element(By.ID,'receipt')
-        receipt_html=receipt.get_attribute('outerHTML')
-        with open('receipt.html','w') as f:
+
+        # html receipt
+        receipt = driver.find_element(By.ID, 'receipt')
+        receipt_html = receipt.get_attribute('outerHTML')
+        with open('receipt.html', 'w') as f:
             f.write(receipt_html)
-        #prepare for pdf
-        
-     
-    
-        #create pdf
-        pdfkit.from_file('receipt.html','order.pdf')
-        
-        #screenshot
+        # prepare for pdf
+
+        # create pdf
+        pdfkit.from_file('receipt.html', 'order.pdf')
+
+        # screenshot
         ordered_robots = driver.find_element(
             By.ID, 'robot-preview')
         ordered_robots.screenshot('order-screenshot.png')
-        
-        
-        
-            
-        
-        
-        
-     
-    
-        
-        
-        
-        
-        
-        
-        
-        
+
     notification.notify(title='order completed',
                         message='excellent', timeout=10)
-        
-        
 
 
 def log_out(driver=driver):
