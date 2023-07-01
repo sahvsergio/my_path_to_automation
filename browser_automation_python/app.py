@@ -127,23 +127,43 @@ def sales_screenshot(driver=driver):
 
 
 def sales_to_pdf():
-    # getting the outer html from table
+    #base xpath for sales table
     sales_table = driver.find_element(
         By.XPATH, '//*[@id="sales-results"]/table')
+    #outerHtml for sales_table
     table_html = sales_table.get_attribute('outerHTML')
+    #xpath for table headers , it returns a list of webdriver elements
     table_header = driver.find_elements(By.XPATH,'//*[@id="sales-results"]/table/thead/tr/th')
-    print(type(table_header))
+    #regular_table_rows=
+    performance_rows = driver.find_elements(By.XPATH,"//*[@id = 'sales-results']/table/tbody/tr/td/span[@class='performance']")
+    
+    
+    #create a new empty list to store  text from webdriver elements in table_header
     table_header_text=[]
+    #loop through the table_header and the performance_rows
+    performance_texts=[]
     
     for  header_title in table_header:
+        #extract text from  each individual webdriver elements in table_header
         header_title_text=header_title.text
+        #append each text to the empty list table_header_text
         table_header_text.append(header_title_text)
+    for performance_row in performance_rows:
+        performance_row_text=performance_row.text
+        performance_texts.append(performance_row_text)
+ 
+    
+
         
-    print(table_header_text)       
+        
+
     
     #create df
     df=pd.DataFrame(columns=table_header_text)
+   #add new dataframe column Performance
+    df['Performance']=performance_texts
     print(df)
+  
 
     
     
