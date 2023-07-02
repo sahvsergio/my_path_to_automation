@@ -134,34 +134,59 @@ def sales_to_pdf():
     table_html = sales_table.get_attribute('outerHTML')
     #xpath for table headers , it returns a list of webdriver elements
     table_header = driver.find_elements(By.XPATH,'//*[@id="sales-results"]/table/thead/tr/th')
+    #xpath for name rows
+    name_rows = driver.find_elements(
+        By.XPATH, '//*[@id="sales-results"]/table/tbody/tr[position() mod 2!=0]/td[1]')
+    
+    #xpath for target
+    target_rows = driver.find_elements(By.XPATH, "// *[@id='sales-results']/table/tbody/tr/td[2]")
     #regular_table_rows=
+    target_rows = driver.find_elements(
+        By.XPATH, "// *[@id='sales-results']/table/tbody/tr/td[3]")
+    
+    
     performance_rows = driver.find_elements(By.XPATH,"//*[@id = 'sales-results']/table/tbody/tr/td/span[@class='performance']")
+    
     
     
     #create a new empty list to store  text from webdriver elements in table_header
     table_header_text=[]
     #loop through the table_header and the performance_rows
+    name_list=[]
     performance_texts=[]
+    target_results=[]
     
     for  header_title in table_header:
         #extract text from  each individual webdriver elements in table_header
         header_title_text=header_title.text
         #append each text to the empty list table_header_text
         table_header_text.append(header_title_text)
+    
+    for name in name_rows:
+        name_text= name.text
+        name_list.append(name_text)
+        
+        
     for performance_row in performance_rows:
         performance_row_text=performance_row.text
         performance_texts.append(performance_row_text)
- 
-    
-
-        
-        
+    for target_row in target_rows:
+        target_row_value=(target_row.text)
+        target_results.append(target_row_value) 
 
     
     #create df
     df=pd.DataFrame(columns=table_header_text)
+    df['Name']=name_list
+    
+    #insert values into each column of the dataframe
+    df['Target'] = target_results
+    #df['Results'] = 
+    #df['Difference']=
+    
    #add new dataframe column Performance
     df['Performance']=performance_texts
+    
     print(df)
   
 
