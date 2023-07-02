@@ -188,22 +188,9 @@ def sales_to_pdf():
     df['Performance']=performance_texts
     
     print(df)
-  
-
-    
-    
-   
-
-    # writing table_html to an html file
-    with open('table.html', 'w') as f:
-        f.write(table_html)
-
-    # reading the html as panda string of pandas dataframes
-    df_html = pd.read_html('table.html')
-    # slicing the 1st dataframe, which contains the text
-    df_string = df_html.to_html()
+    df.to_html('table.html')
     # creating the pdf
-    pdfkit.from_string(df_string, 'table.pdf')
+    pdfkit.from_file('table.html', 'table.pdf')
 
 
 def download_orders_file():
