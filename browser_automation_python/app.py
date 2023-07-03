@@ -130,8 +130,7 @@ def sales_to_pdf():
     #base xpath for sales table
     sales_table = driver.find_element(
         By.XPATH, '//*[@id="sales-results"]/table')
-    #outerHtml for sales_table
-    table_html = sales_table.get_attribute('outerHTML')
+    
     #xpath for table headers , it returns a list of webdriver elements
     table_header = driver.find_elements(By.XPATH,'//*[@id="sales-results"]/table/thead/tr/th')
     #xpath for name rows
@@ -141,8 +140,11 @@ def sales_to_pdf():
     #xpath for target
     target_rows = driver.find_elements(By.XPATH, "// *[@id='sales-results']/table/tbody/tr/td[2]")
     #regular_table_rows=
-    target_rows = driver.find_elements(
+    result_rows = driver.find_elements(
         By.XPATH, "// *[@id='sales-results']/table/tbody/tr/td[3]")
+    difference_rows = driver.find_elements(
+        By.XPATH, "// *[@id='sales-results']/table/tbody/tr/td[4]")
+
     
     
     performance_rows = driver.find_elements(By.XPATH,"//*[@id = 'sales-results']/table/tbody/tr/td/span[@class='performance']")
@@ -150,46 +152,60 @@ def sales_to_pdf():
     
     
     #create a new empty list to store  text from webdriver elements in table_header
-    table_header_text=[]
+    header_text=[]
     #loop through the table_header and the performance_rows
-    name_list=[]
+    name_texts=[]
+    target_texts = []
+    results_texts=[]
+    difference_texts=[]
     performance_texts=[]
-    target_results=[]
+   
     
     for  header_title in table_header:
         #extract text from  each individual webdriver elements in table_header
         header_title_text=header_title.text
         #append each text to the empty list table_header_text
-        table_header_text.append(header_title_text)
+        header_text.append(header_title_text)
     
     for name in name_rows:
         name_text= name.text
-        name_list.append(name_text)
+        name_texts.append(name_text)
         
+    for target_row in target_rows:
+        target_text = (target_row.text)
+        target_texts.append(target_text)
+    
+    for result in result_rows:
+        result_text = (result.text)
+        results_texts.append(result_text)
+        
+    for difference in difference_rows:
+        difference_text = (difference.text)
+        difference_texts.append(difference_text)
         
     for performance_row in performance_rows:
         performance_row_text=performance_row.text
         performance_texts.append(performance_row_text)
-    for target_row in target_rows:
-        target_row_value=(target_row.text)
-        target_results.append(target_row_value) 
+    
 
     
     #create df
-    df=pd.DataFrame(columns=table_header_text)
-    df['Name']=name_list
+    df=pd.DataFrame(columns=header_text)
+    df['Name']=name_texts
     
     #insert values into each column of the dataframe
-    df['Target'] = target_results
-    #df['Results'] = 
-    #df['Difference']=
+    df['Target'] = target_texts
+    df['Result'] =results_texts
+    df['Difference']=difference_texts
     
    #add new dataframe column Performance
     df['Performance']=performance_texts
+  
+  #style the daframe
+        
     
     print(df)
-    df.to_html('table.html')
-    # creating the pdf
+    df.to_html('table.html',justify='center',  bold_rows=True, index=False)
     pdfkit.from_file('table.html', 'table.pdf')
 
 
