@@ -31,10 +31,17 @@ import pdfkit
 from plyer import notification
 
 options = Options()
-options.add_experimental_option('detach', True)
+options.add_experimental_option('excludeSwitches',['enable-automation'])#remove the message of it being controlled by automation software
+
+options.add_argument('--disable-infobars')
+
+#options.add_argument('--disable-notifications')
+
+
+
 # creating an  instance of the webdriver
 driver = webdriver.Chrome(options=options)
-
+driver.maximize_window()
 
 def sign_in(driver=driver):
     # opening the website
@@ -200,15 +207,13 @@ def sales_to_pdf():
     
    #add new dataframe column Performance
     df['Performance']=performance_texts
-  
-  #style the daframe
         
+    #turn  df into html
+    df.to_html('table.html',classes='data', header="true", justify='center', index=False)
     
-    print(df)
-    df.to_html('table.html',justify='center',  bold_rows=True, index=False)
+    #create pdf out of html file
     pdfkit.from_file('table.html', 'table.pdf')
-
-
+    
 def download_orders_file():
 
     os.chdir('../orders')
@@ -288,29 +293,34 @@ def create_orders():
 
         # screenshot
         ordered_robots = driver.find_element(
-            By.ID, 'robot-preview')
+            By.XPATH, "//div[@id='robot-preview']")
+        #driver.execute_script("document.body.style.zoom='45%'")
         ordered_robots.screenshot('order-screenshot.png')
 
-    notification.notify(title='order completed',
-                        message='excellent', timeout=10)
+        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+            StaleElementReferenceException, NoSuchElementException])
+
+        
+        #driver.implicitly_wait(20)
+
+    #notification.notify(title='order completed',
+                       # message='excellent', timeout=10)
 
 
 def log_out(driver=driver):
-    log_out_button = driver.find_element(By.ID, 'logout')
-    log_out_button.click()
-    driver.quit()
-    notification.notify(title='Sales Completed', message='All orders have been completed',
-                        timeout=10)
+    pass
+    
+    
+    
 
 sign_in()
 create_directory()
 enter_sales()
 sales_screenshot()
 sales_to_pdf()
-#download_orders_file()
-#get_order_page()
-#
-# create_orders()
+download_orders_file()
+get_order_page()
+create_orders()
 # log_out()
 
 """
