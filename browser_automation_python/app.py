@@ -49,6 +49,7 @@ def sign_in(driver=driver):
     # environment variables
     robospare_user = os.environ.get('robospare_user')
     robospare_pass = os.environ.get('robospare_pass')
+    print(robospare_pass)
 
     driver.implicitly_wait(10)
 
@@ -225,8 +226,7 @@ def download_orders_file():
 
 
 def get_order_page(driver=driver):
-    driver.get(
-        'https://robotsparebinindustries.com/?firstname=Vincenty&lastname=Stannering&salesresult=109884#/robot-order')
+    driver.find_element(By.LINK_TEXT,'Order your robot!').click()
 
     # order_page = driver.find_element(By.XPATH, '//*[@id="root"]/header/div/ul/li[2]/a')
     # order_page.click()
@@ -283,22 +283,22 @@ def create_orders():
 
         # html receipt
         receipt = driver.find_element(By.ID, 'receipt')
+        receipt_screenshot=receipt.screenshot('receipt_pic.png')
         receipt_html = receipt.get_attribute('outerHTML')
         with open('receipt.html', 'w') as f:
             f.write(receipt_html)
         # prepare for pdf
+        
 
         # create pdf
-        pdfkit.from_file('receipt.html', 'order.pdf')
+        #pdfkit.from_file('receipt.html', 'order.pdf')
 
         # screenshot
         ordered_robots = driver.find_element(
-            By.XPATH, "//div[@id='robot-preview']")
-        #driver.execute_script("document.body.style.zoom='45%'")
-        ordered_robots.screenshot('order-screenshot.png')
-
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-            StaleElementReferenceException, NoSuchElementException])
+            By.XPATH, "//div[@id='robot-preview']").screenshot('robot_screenshot.png')
+        #driver.execute_script("document.body.style.zoom='49%'")
+        pdfkit.from_file(['receipt_pic.png','robot_screenshot.png'],'order-pdf.pdf'       )
+        
 
         
         #driver.implicitly_wait(20)
