@@ -289,6 +289,9 @@ def create_orders():
 
         legs_field.send_keys(legs)
         address_field.send_keys(address)
+        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+            StaleElementReferenceException, NoSuchElementException])        
+        
 
         preview_button.click()
         # show order
@@ -296,20 +299,26 @@ def create_orders():
         order_button.click()
 
         # html receipt
-        
        
-        receipt = driver.find_element(By.ID, 'receipt')   
-        wait = WebDriverWait(receipt, timeout=10, poll_frequency=5, ignored_exceptions=[
-            StaleElementReferenceException, NoSuchElementException])  
         
+        receipt = driver.find_element(By.ID, 'receipt') 
+        
+        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+           StaleElementReferenceException, NoSuchElementException])        
         receipt_screenshot = receipt.screenshot('receipt_pic.png')
-        #robot preview
-       
+        
+        #robot preview       
         robots = driver.find_element(
             By.XPATH, "//div[@id='robot-preview']")
         wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
             StaleElementReferenceException, NoSuchElementException])  
+        #driver.execute_script("document.body.style.zoom='90%'")
+        
         robots.screenshot('robot_screenshot.png')
+        
+        order_another=driver.find_element(By.ID,'order-another')
+        order_another.click()
+        get_order_page()
         """
         
         # prepare for pdf
