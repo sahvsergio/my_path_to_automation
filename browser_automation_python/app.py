@@ -31,6 +31,10 @@ import pdfkit
 # desktop notification
 from plyer import notification
 
+#Image processing
+from PIL import Image
+
+
 options = Options()
 
 # remove the message of it being controlled by automation software
@@ -318,14 +322,25 @@ def create_orders():
         #driver.execute_script("document.body.style.zoom='90%'")
         
         robots.screenshot('robot_screenshot.png')
-        image_files=['receipt_pic.png','robot_screenshot.png']
-        order_file='order.pdf'
+        pdf_file='order.pdf'
+        image_filepath1='../orders/receipt_pic.png'
+        image_filepath2='../orders/robot_screenshot.png'
+        image_1=Image.open(image_filepath1)
+        image_2=Image.open(image_filepath2)
+        pdf_width=max(image_1.width,image_2.width)
+        pdf_height=image_1.height+image_2.height
+        pdf=Image.new('RGB',(pdf_width,pdf_height),(255,255,255))
+        pdf.paste(image_1,(0,0))
+        pdf.paste(image_2,(0,image_1.height))
+        pdf.save(pdf_file, save_all=True)
+        
         #pdfkit.from_file(image_files,order_file )
+        
         
         
         order_another=driver.find_element(By.ID,'order-another')
         order_another.click()
-        
+        image_file.save(image_pdf,save_all=True,append_images=image_file)
         """
         
         # prepare for pdf
