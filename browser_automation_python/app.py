@@ -322,19 +322,28 @@ def create_orders():
         #driver.execute_script("document.body.style.zoom='90%'")
         
         robots.screenshot('robot_screenshot.png')
+        #name for the final pdf
         pdf_file='order.pdf'
+        
+        #filepaths for both pictures
         image_filepath1='../orders/receipt_pic.png'
         image_filepath2='../orders/robot_screenshot.png'
+        #opening both pictures
         image_1=Image.open(image_filepath1)
         image_2=Image.open(image_filepath2)
+        #calculating the pdf with and height based on images  height
         pdf_width=max(image_1.width,image_2.width)
         pdf_height=image_1.height+image_2.height
+        
+        #create blank picture
         pdf=Image.new('RGB',(pdf_width,pdf_height),(255,255,255))
+        #pasting both images one after the other stacked vertically
         pdf.paste(image_1,(0,0))
         pdf.paste(image_2,(0,image_1.height))
+        #saving the canvas as pdf
         pdf.save(pdf_file, save_all=True)
         
-        #pdfkit.from_file(image_files,order_file )
+        
         
         
         
