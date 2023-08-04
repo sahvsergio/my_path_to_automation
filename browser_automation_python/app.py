@@ -1,6 +1,7 @@
 import os
 
 
+
 import selenium
 from selenium import webdriver
 from selenium.webdriver import Keys, ActionChains
@@ -296,6 +297,8 @@ def create_orders():
         preview_button.click()
         # show order
         order_button = driver.find_element(By.ID, 'order')
+        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+           StaleElementReferenceException, NoSuchElementException])  
         order_button.click()
 
         # html receipt
@@ -304,7 +307,7 @@ def create_orders():
         receipt = driver.find_element(By.ID, 'receipt') 
         
         wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-           StaleElementReferenceException, NoSuchElementException])        
+           StaleElementReferenceException, NoSuchElementException])       
         receipt_screenshot = receipt.screenshot('receipt_pic.png')
         
         #robot preview       
@@ -315,10 +318,14 @@ def create_orders():
         #driver.execute_script("document.body.style.zoom='90%'")
         
         robots.screenshot('robot_screenshot.png')
+        image_files=['receipt_pic.png','robot_screenshot.png']
+        order_file='order.pdf'
+        #pdfkit.from_file(image_files,order_file )
+        
         
         order_another=driver.find_element(By.ID,'order-another')
         order_another.click()
-        get_order_page()
+        
         """
         
         # prepare for pdf
