@@ -351,26 +351,7 @@ def create_orders():
         order_another.click()
         image_file.save(image_pdf,save_all=True,append_images=image_file)
         """
-        
-        # prepare for pdf
-
-        # create pdf
-        # pdfkit.from_file('receipt.html', 'order.pdf')
-
-        # screenshot
-
-        
-
-        driver.execute_script("document.body.style.zoom='90%'")
-        ordered_robots.screenshot()
-        order_another_button=driver.find_element(By.ID, 'order-another')
-        order_another_button.click()
-        
-        pdfkit.from_file(
-            ['receipt_pic.png', 'robot_screenshot.png'], 'order-pdf.pdf')
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-            StaleElementReferenceException, NoSuchElementException])
-       
+     
         
 
     # notification.notify(title='order completed',
