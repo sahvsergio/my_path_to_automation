@@ -36,10 +36,13 @@ from PIL import Image
 
 
 options = Options()
+prefs = {"credentials_enable_service": False,
+     "profile.password_manager_enabled": False}
 
 # remove the message of it being controlled by automation software
 options.add_experimental_option('excludeSwitches', ['enable-automation'])
 options.add_experimental_option('detach', True)
+options.add_experimental_option('prefs',prefs)
 
 
 # creating an  instance of the webdriver
@@ -54,6 +57,7 @@ def sign_in(driver=driver):
     robospare_user = os.environ.get('robospare_user')
     robospare_pass = os.environ.get('robospare_pass')
     
+    
 
     driver.implicitly_wait(10)
 
@@ -63,6 +67,7 @@ def sign_in(driver=driver):
     password_field = driver.find_element(By.ID, 'password')
 
     login_button = driver.find_element(By.CLASS_NAME, 'btn-primary')
+    
 
     driver.implicitly_wait(10)
     # enter info on fields
@@ -70,6 +75,8 @@ def sign_in(driver=driver):
     driver.implicitly_wait(10)
     password_field.send_keys(str(robospare_pass))
     button_click = login_button.click()
+    
+    options.add_argument('--disable-save-password-bubble')
 
 
 def create_directory():
@@ -343,13 +350,9 @@ def create_orders():
         #saving the canvas as pdf
         pdf.save(pdf_file, save_all=True)
         
-        
-        
-        
-        
         order_another=driver.find_element(By.ID,'order-another')
         order_another.click()
-        image_file.save(image_pdf,save_all=True,append_images=image_file)
+       
         """
      
         
