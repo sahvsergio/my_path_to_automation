@@ -1,4 +1,6 @@
 import os
+import datetime
+import random
 
 
 
@@ -82,12 +84,13 @@ def sign_in(driver=driver):
 def create_directory():
 
     # download sales file
+    today=datetime.date.today().strftime(' %d-%m-%Y')
     try:
-        os.mkdir('sales')
-        os.mkdir('orders')
-        os.chdir('sales')
+        os.mkdir(f'sales-{today}')
+        os.mkdir(f'orders')
+        os.chdir(f'sales-{today}')
     except FileExistsError:
-        os.chdir('sales')
+        os.chdir(f'sales-{today}')
 
 
 def download_sales_file():
@@ -98,7 +101,7 @@ def download_sales_file():
     return df_sheet
 
 
-def enter_sales(driver=driver):
+def enter_sales(driver=driver,):
     df_sheet = download_sales_file()
     # identifying all fields of sales form
 
@@ -241,7 +244,7 @@ def sales_to_pdf():
     # create pdf out of html file
     pdfkit.from_file('table.html','table.pdf',)
 
-
+#orders
 def download_orders_file():
 
     os.chdir('../orders')
@@ -253,15 +256,22 @@ def download_orders_file():
 
 
 def get_order_page(driver=driver):
-    driver.find_element(By.LINK_TEXT, 'Order your robot!').click()
+    try:
+        prder_robot=driver.find_element(By.LINK_TEXT, 'Order your robot!').click()
 
-    # order_page = driver.find_element(By.XPATH, '//*[@id="root"]/header/div/ul/li[2]/a')
-    # order_page.click()
-    driver.implicitly_wait(20)
-    alert_button = driver.find_element(
+        # order_page = driver.find_element(By.XPATH, '//*[@id="root"]/header/div/ul/li[2]/a')
+        # order_page.click()
+        driver.implicitly_wait(20)
+        alert_button = driver.find_element(
         By.XPATH, '//*[@id="root"]/div/div[2]/div/div/div/div/div/button[1]')
+    
 
-    alert_button.click()
+        alert_button.click()
+    except NoSuchElementException:
+        
+        alert_button = driver.find_element(
+        By.CLASS_NAME, 'modal')
+        alert_button.click()
 
 
 def create_orders():
@@ -283,12 +293,8 @@ def create_orders():
 
     # address
     address_field = driver.find_element(By.ID, 'address')
-    # preview button
-    preview_button = driver.find_element(By.ID, 'preview')
-    order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
-
+    
     # fill out the order
-
     for head, body_type, legs, address in zip(csv_df['Head'], csv_df['Body'], csv_df['Legs'], csv_df['Legs']):
 
         driver.implicitly_wait(10)
@@ -301,69 +307,81 @@ def create_orders():
 
         legs_field.send_keys(legs)
         address_field.send_keys(address)
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-            StaleElementReferenceException, NoSuchElementException])        
         
-
-        preview_button.click()
-        # show order
-        order_button = driver.find_element(By.ID, 'order')
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-           StaleElementReferenceException, NoSuchElementException])  
-        order_button.click()
-
-        # html receipt
-       
+        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
         
-        receipt = driver.find_element(By.ID, 'receipt') 
-        
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-           StaleElementReferenceException, NoSuchElementException])       
-        receipt_screenshot = receipt.screenshot('receipt_pic.png')
-        
-        #robot preview       
-        robots = driver.find_element(
-            By.XPATH, "//div[@id='robot-preview']")
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-            StaleElementReferenceException, NoSuchElementException])  
-        #driver.execute_script("document.body.style.zoom='90%'")
-        
-        robots.screenshot('robot_screenshot.png')
-        #name for the final pdf
-        pdf_file='order.pdf'
-        
-        #filepaths for both pictures
-        image_filepath1='../orders/receipt_pic.png'
-        image_filepath2='../orders/robot_screenshot.png'
-        #opening both pictures
-        image_1=Image.open(image_filepath1)
-        image_2=Image.open(image_filepath2)
-        #calculating the pdf with and height based on images  height
-        pdf_width=max(image_1.width,image_2.width)
-        pdf_height=image_1.height+image_2.height
-        
-        #create blank picture
-        pdf=Image.new('RGB',(pdf_width,pdf_height),(255,255,255))
-        #pasting both images one after the other stacked vertically
-        pdf.paste(image_1,(0,0))
-        pdf.paste(image_2,(0,image_1.height))
-        #saving the canvas as pdf
-        pdf.save(pdf_file, save_all=True)
-        
-        order_another=driver.find_element(By.ID,'order-another')
+        #order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
+        #wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
+        #order_button.click()  
+        order_screenshot()
+        order_pdf()
+        order_another=driver.find_element(By.ID, 'order-another')
         order_another.click()
-       
-        """
-     
+        get_order_page()
+        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
+         
         
 
-    # notification.notify(title='order completed',
-        # message='excellent', timeout=10)
+       
+def order_screenshot(driver=driver):
+    
+   #robot preview
+    preview_button = driver.find_element(By.ID, 'preview')
+    #order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
+    wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
+    preview_button.click() 
+    wait = WebDriverWait(driver, timeout=30, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
+    robots = driver.find_element(
+            By.XPATH, "//div[@id='robot-preview']")
+    wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+            StaleElementReferenceException, NoSuchElementException]) 
+    
+    robots.screenshot(f'robot_screenshot.png')
+    wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+           StaleElementReferenceException, NoSuchElementException])
+    #order receipt
+    order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
+    wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+           StaleElementReferenceException, NoSuchElementException])
+    order_button.click()
+    receipt = driver.find_element(By.ID, 'receipt') 
+    wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+           StaleElementReferenceException, NoSuchElementException])       
+    receipt_screenshot = receipt.screenshot(f'receipt_pic.png')
 
+   
+    #screenshots
+  
+    
+
+        
+def order_pdf():
+    pdf_file='order.pdf'
+        
+    #filepaths for both pictures
+    image_filepath1=f'../orders/receipt_pic.png'
+    image_filepath2='../orders/robot_screenshot.png'
+    #opening both pictures
+    image_1=Image.open(image_filepath1)
+    image_2=Image.open(image_filepath2)
+    #calculating the pdf with and height based on images  height
+    pdf_width=max(image_1.width,image_2.width)
+    pdf_height=image_1.height+image_2.height
+        
+    #create blank picture
+    pdf=Image.new('RGB',(pdf_width,pdf_height),(255,255,255))
+    #pasting both images one after the other stacked vertically
+    pdf.paste(image_1,(0,0))
+    pdf.paste(image_2,(0,image_1.height))
+    #saving the canvas as pdf
+    pdf.save(pdf_file, save_all=True)
+    
 
 def log_out(driver=driver):
-    pass
-"""
+    
+    notification.notify(title='order completed',
+         message='excellent', timeout=10)
+   
 
 sign_in()
 create_directory()
@@ -373,6 +391,7 @@ sales_to_pdf()
 download_orders_file()
 get_order_page()
 create_orders()
+
 # log_out()
 
 """
