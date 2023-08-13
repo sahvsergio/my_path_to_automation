@@ -219,7 +219,7 @@ def sales_to_pdf():
     
     #style the dataframe
     
-    properties = {"border": "2px solid black", "color": "black", "font-size": "16px",'text-align':'center','align':'center'}
+    properties = {"border": "4px solid black", "color": "black", "font-size": "16px",'text-align':'center','align':'center'}
     df_header_styles={
         'selector':'th:not(.index_name)',
         'props':[('border','5px,solid,black'),('background-color','green'), ('padding', 'auto')]
@@ -234,7 +234,7 @@ def sales_to_pdf():
     
     css = """
         table {
-          margin: 0 auto;
+          margin:auto,auto;
         }
     """
 
@@ -267,11 +267,12 @@ def get_order_page(driver=driver):
     
 
         alert_button.click()
-    except NoSuchElementException:
+    except selenium.common.exceptions.ElementClickInterceptedException:
+        ok_button=driver.find_element(By.XPATH,'//*[@id="root"]/div/div[2]/div/div/div/div/div/button[1]')
+        wait=WebDriverWait(driver, 20).until(EC.element_to_be_clickable(ok_button)).click()
         
-        alert_button = driver.find_element(
-        By.CLASS_NAME, 'modal')
-        alert_button.click()
+   
+       
 
 
 def create_orders():
@@ -295,9 +296,11 @@ def create_orders():
     address_field = driver.find_element(By.ID, 'address')
     
     # fill out the order
+    
+  
     for head, body_type, legs, address in zip(csv_df['Head'], csv_df['Body'], csv_df['Legs'], csv_df['Legs']):
 
-        driver.implicitly_wait(10)
+               
 
         select_head.select_by_value(str(head))
         for field in body_fields:
@@ -308,19 +311,14 @@ def create_orders():
         legs_field.send_keys(legs)
         address_field.send_keys(address)
         
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
+        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])      
         
-        #order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
-        #wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
-        #order_button.click()  
         order_screenshot()
         order_pdf()
         order_another=driver.find_element(By.ID, 'order-another')
         order_another.click()
         get_order_page()
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
-         
-        
+        wait=WebDriverWait(driver, 10).unti(EC.staleness_of(select_head))
 
        
 def order_screenshot(driver=driver):
@@ -350,7 +348,7 @@ def order_screenshot(driver=driver):
     receipt_screenshot = receipt.screenshot(f'receipt_pic.png')
 
    
-    #screenshots
+   
   
     
 
@@ -396,10 +394,4 @@ create_orders()
 
 """
 https://robotsparebinindustries.com/#/robot-order
-""""""
-
-Only the robot is allowed to get the orders file. You may not save the file manually on your computer.
-The robot should save each order HTML receipt as a PDF file.
-The robot should save a screenshot of each of the ordered robots.
-The robot should embed the screenshot of the robot to the PDF receipt.
 """
