@@ -1,6 +1,7 @@
 import os
 import datetime
 import random
+import shutil
 
 
 
@@ -87,7 +88,7 @@ def create_directory():
     today=datetime.date.today().strftime(' %d-%m-%Y')
     try:
         os.mkdir(f'sales-{today}')
-        os.mkdir(f'orders')
+        os.mkdir(f'orders-{today}')
         os.chdir(f'sales-{today}')
     except FileExistsError:
         os.chdir(f'sales-{today}')
@@ -246,8 +247,9 @@ def sales_to_pdf():
 
 #orders
 def download_orders_file():
+    today=datetime.date.today().strftime(' %d-%m-%Y')
 
-    os.chdir('../orders')
+    os.chdir(f'../orders-{today}')
     order_url = 'https://robotsparebinindustries.com/orders.csv'
     csv_df = pd.read_csv(order_url)
     csv_df.set_index('Order number', inplace=True)
@@ -282,44 +284,45 @@ def create_orders():
 
     # selectors
     # head field
-    head_field = driver.find_element(By.ID, 'head')
-    select_head = Select(head_field)
+    try:
+        head_field = driver.find_element(By.ID, 'head')
+        select_head = Select(head_field)
 
-    # body field
-    body_fields = driver.find_elements(By.CSS_SELECTOR, '.form-check-input')
+        # body field
+        body_fields = driver.find_elements(By.CSS_SELECTOR, '.form-check-input')
 
-    # legs field
-    legs_field = driver.find_element(
-        By.XPATH, '/html/body/div/div/div[1]/div/div[1]/form/div[3]/input')
+        # legs field
+        legs_field = driver.find_element(
+            By.XPATH, '/html/body/div/div/div[1]/div/div[1]/form/div[3]/input')
 
-    # address
-    address_field = driver.find_element(By.ID, 'address')
+        # address
+        address_field = driver.find_element(By.ID, 'address')
     
-    # fill out the order
+        # fill out the order
     
   
-    for head, body_type, legs, address in zip(csv_df['Head'], csv_df['Body'], csv_df['Legs'], csv_df['Legs']):
+        for head, body_type, legs, address in zip(csv_df['Head'], csv_df['Body'], csv_df['Legs'], csv_df['Legs']):
+            select_head.select_by_value(str(head))
+            for field in body_fields:
+                field = field
+                if field.get_attribute('value') == str(body_type):
+                    field.click()
 
-               
-
-        select_head.select_by_value(str(head))
-        for field in body_fields:
-            field = field
-            if field.get_attribute('value') == str(body_type):
-                field.click()
-
-        legs_field.send_keys(legs)
-        address_field.send_keys(address)
+            legs_field.send_keys(legs)
+            address_field.send_keys(address)
         
-        wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])      
+            wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])      
         
-        order_screenshot()
-        order_pdf()
-        order_another=driver.find_element(By.ID, 'order-another')
-        order_another.click()
-        get_order_page()
-        wait=WebDriverWait(driver, 10).unti(EC.staleness_of(select_head))
-
+            order_screenshot()
+            order_pdf()
+            order_another=driver.find_element(By.ID, 'order-another')
+            order_another.click()
+            get_order_page()
+            create_zip()
+            
+    except StaleElementReferenceException:
+        pass
+    
        
 def order_screenshot(driver=driver):
     
@@ -354,11 +357,12 @@ def order_screenshot(driver=driver):
 
         
 def order_pdf():
+    today=datetime.date.today().strftime(' %d-%m-%Y')
     pdf_file='order.pdf'
         
     #filepaths for both pictures
-    image_filepath1=f'../orders/receipt_pic.png'
-    image_filepath2='../orders/robot_screenshot.png'
+    image_filepath1=f'../orders-{today}/receipt_pic.png'
+    image_filepath2=f'../orders-{today}/robot_screenshot.png'
     #opening both pictures
     image_1=Image.open(image_filepath1)
     image_2=Image.open(image_filepath2)
@@ -373,6 +377,16 @@ def order_pdf():
     pdf.paste(image_2,(0,image_1.height))
     #saving the canvas as pdf
     pdf.save(pdf_file, save_all=True)
+
+def create_zip():
+    today=datetime.date.today().strftime(' %d-%m-%Y')
+    filename='compressed-orders'
+    format='zip'
+    directory=f'../orders-{today}'
+    shutil.make_archive(filename, format,directory)
+    notification.notify(title='order completed',
+         message='excellent', timeout=10)
+    
     
 
 def log_out(driver=driver):
@@ -389,7 +403,6 @@ sales_to_pdf()
 download_orders_file()
 get_order_page()
 create_orders()
-
 # log_out()
 
 """
