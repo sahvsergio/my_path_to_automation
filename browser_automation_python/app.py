@@ -33,11 +33,15 @@ import pdfkit
 
 # desktop notification
 from plyer import notification
+from plyer.facades import TTS
+
 
 #Image processing
 from PIL import Image
 
-
+tts=TTS()
+message='Hello, the program is starting'
+tts.speak(message)
 options = Options()
 prefs = {"credentials_enable_service": False,
      "profile.password_manager_enabled": False}
@@ -394,8 +398,8 @@ def create_zip():
     format='zip'
     directory= f"{os.path.join(os.pardir,f'orders-{today}')}"
     shutil.make_archive(filename, format,directory)
-    #notification.notify(title='order completed',
-     #    message='excellent', timeout=10)
+    notification.notify(title='order completed',
+         message='excellent', timeout=10)
     
     
 
