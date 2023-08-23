@@ -86,6 +86,7 @@ def create_directory():
 
     # download sales file
     today=datetime.date.today().strftime(' %d-%m-%Y')
+    
     try:
         os.mkdir(f'sales-{today}')
         os.mkdir(f'orders-{today}')
@@ -318,10 +319,19 @@ def create_orders():
             order_another=driver.find_element(By.ID, 'order-another')
             order_another.click()
             get_order_page()
-            create_zip()
+    
+            
+    
+    
+       
             
     except StaleElementReferenceException:
         pass
+    
+    finally:
+        create_zip()
+    
+    
     
        
 def order_screenshot(driver=driver):
@@ -380,12 +390,12 @@ def order_pdf():
 
 def create_zip():
     today=datetime.date.today().strftime(' %d-%m-%Y')
-    filename='compressed-orders'
+    filename=os.path.expanduser(os.path.join(os.pardir,'zipped_orders'))
     format='zip'
-    directory=f'../orders-{today}'
+    directory= f"{os.path.join(os.pardir,f'orders-{today}')}"
     shutil.make_archive(filename, format,directory)
-    notification.notify(title='order completed',
-         message='excellent', timeout=10)
+    #notification.notify(title='order completed',
+     #    message='excellent', timeout=10)
     
     
 
@@ -403,6 +413,7 @@ sales_to_pdf()
 download_orders_file()
 get_order_page()
 create_orders()
+
 # log_out()
 
 """
