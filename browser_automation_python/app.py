@@ -30,18 +30,29 @@ import pandas as pd
 from bs4 import BeautifulSoup
 # transform  into pdf
 import pdfkit
+import subprocess
 
 # desktop notification
 from plyer import notification
 from plyer.facades import TTS
 
+#speaker
+
+class UbuntuTTS(TTS):
+    def _speak(self, message):
+        subprocess.run(['espeak', message])
+
+tts=UbuntuTTS()
+
 
 #Image processing
 from PIL import Image
 
-tts=TTS()
+
 message='Hello, the program is starting'
 tts.speak(message)
+
+
 options = Options()
 prefs = {"credentials_enable_service": False,
      "profile.password_manager_enabled": False}
@@ -87,6 +98,7 @@ def sign_in(driver=driver):
 
 
 def create_directory():
+    tts.speak()
 
     # download sales file
     today=datetime.date.today().strftime(' %d-%m-%Y')
@@ -322,11 +334,7 @@ def create_orders():
             order_pdf()
             order_another=driver.find_element(By.ID, 'order-another')
             order_another.click()
-            get_order_page()
-    
-            
-    
-    
+            get_order_page()  
        
             
     except StaleElementReferenceException:
@@ -334,10 +342,8 @@ def create_orders():
     
     finally:
         create_zip()
-    
-    
-    
-       
+
+
 def order_screenshot(driver=driver):
     
    #robot preview
@@ -362,14 +368,9 @@ def order_screenshot(driver=driver):
     receipt = driver.find_element(By.ID, 'receipt') 
     wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
            StaleElementReferenceException, NoSuchElementException])       
-    receipt_screenshot = receipt.screenshot(f'receipt_pic.png')
+    receipt_screenshot = receipt.screenshot(f'receipt_pic.png') 
 
-   
-   
-  
-    
 
-        
 def order_pdf():
     today=datetime.date.today().strftime(' %d-%m-%Y')
     pdf_file='order.pdf'
@@ -392,6 +393,7 @@ def order_pdf():
     #saving the canvas as pdf
     pdf.save(pdf_file, save_all=True)
 
+
 def create_zip():
     today=datetime.date.today().strftime(' %d-%m-%Y')
     filename=os.path.expanduser(os.path.join(os.pardir,'zipped_orders'))
@@ -401,12 +403,19 @@ def create_zip():
     notification.notify(title='order completed',
          message='excellent', timeout=10)
     
+def send_email():
+    pass
     
 
 def log_out(driver=driver):
     
-    notification.notify(title='order completed',
-         message='excellent', timeout=10)
+    notification.notify(title='Bye',
+         message='it\'s time to say goodbye', timeout=10)
+    driver.quit()
+   
+   
+   
+   
    
 
 sign_in()
@@ -417,8 +426,17 @@ sales_to_pdf()
 download_orders_file()
 get_order_page()
 create_orders()
+log_out()
 
-# log_out()
+
+
+
+
+
+
+
+
+
 
 """
 https://robotsparebinindustries.com/#/robot-order
