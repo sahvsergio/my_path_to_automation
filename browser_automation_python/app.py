@@ -4,7 +4,6 @@ import random
 import shutil
 
 
-
 import selenium
 from selenium import webdriver
 from selenium.webdriver import Keys, ActionChains
@@ -30,52 +29,66 @@ import pandas as pd
 from bs4 import BeautifulSoup
 # transform  into pdf
 import pdfkit
+
+# handle pc processes
 import subprocess
 
 # desktop notification
+import plyer
 from plyer import notification
-from plyer.facades import TTS
-
-#speaker
-
-class UbuntuTTS(TTS):
-    def _speak(self, message):
-        subprocess.run(['espeak', message])
-
-tts=UbuntuTTS()
+from plyer.facades import TTS, STT
 
 
-#Image processing
+# Image processing
 from PIL import Image
 
-
-message='Hello, the program is starting'
+tts = UbuntuTTS()
+message = 'Hello, the program is starting'
 tts.speak(message)
+
+
+class UbuntuTTS(TTS):
+    def _speak(self, message, speed=150, language='en-us'):
+        subprocess.run(['espeak', '-s', str(speed), '-v', language,  message])
 
 
 options = Options()
 prefs = {"credentials_enable_service": False,
-     "profile.password_manager_enabled": False}
+         "profile.password_manager_enabled": False}
 
 # remove the message of it being controlled by automation software
 options.add_experimental_option('excludeSwitches', ['enable-automation'])
 options.add_experimental_option('detach', True)
-options.add_experimental_option('prefs',prefs)
+options.add_experimental_option('prefs', prefs)
 
 
 # creating an  instance of the webdriver
 driver = webdriver.Chrome(options=options)
+print(type(driver))
 driver.maximize_window()
 
 
-def sign_in(driver=driver):
+def sign_in(driver: selenium.webdriver.chrome.webdriver.WebDriver = driver):
+   """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
     # opening the website
     driver.get('https://robotsparebinindustries.com/')
     # environment variables
     robospare_user = os.environ.get('robospare_user')
     robospare_pass = os.environ.get('robospare_pass')
-    
-    
 
     driver.implicitly_wait(10)
 
@@ -85,7 +98,6 @@ def sign_in(driver=driver):
     password_field = driver.find_element(By.ID, 'password')
 
     login_button = driver.find_element(By.CLASS_NAME, 'btn-primary')
-    
 
     driver.implicitly_wait(10)
     # enter info on fields
@@ -93,16 +105,31 @@ def sign_in(driver=driver):
     driver.implicitly_wait(10)
     password_field.send_keys(str(robospare_pass))
     button_click = login_button.click()
-    
+
     options.add_argument('--disable-save-password-bubble')
 
 
 def create_directory():
-    tts.speak()
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
+    tts.speak('the directories are being created')
 
     # download sales file
-    today=datetime.date.today().strftime(' %d-%m-%Y')
-    
+    today = datetime.date.today().strftime(' %d-%m-%Y')
+
     try:
         os.mkdir(f'sales-{today}')
         os.mkdir(f'orders-{today}')
@@ -112,6 +139,21 @@ def create_directory():
 
 
 def download_sales_file():
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
     sales_url = 'https://robotsparebinindustries.com/SalesData.xlsx'
     my_sales_file = pd.read_excel(sales_url)
     excel_sales = my_sales_file.to_excel('SalesData.xlsx')
@@ -120,6 +162,21 @@ def download_sales_file():
 
 
 def enter_sales(driver=driver,):
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
     df_sheet = download_sales_file()
     # identifying all fields of sales form
 
@@ -159,12 +216,42 @@ def enter_sales(driver=driver,):
 
 
 def sales_screenshot(driver=driver):
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
     sales_summary = driver.find_element(
         By.XPATH, '//*[@id="root"]/div/div/div/div[2]/div[1]')
     sales_screenshot = sales_summary.screenshot(f'./sales-summary.png')
 
 
 def sales_to_pdf():
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
     # base xpath for sales table
     sales_table = driver.find_element(
         By.XPATH, '//*[@id="sales-results"]/table')
@@ -234,37 +321,52 @@ def sales_to_pdf():
 
    # add new dataframe column Performance
     df['Performance'] = performance_texts
-    
-    #style the dataframe
-    
-    properties = {"border": "4px solid black", "color": "black", "font-size": "16px",'text-align':'center','align':'center'}
-    df_header_styles={
-        'selector':'th:not(.index_name)',
-        'props':[('border','5px,solid,black'),('background-color','green'), ('padding', 'auto')]
-    }
-    styled_df=df.style.set_properties(**properties).hide(axis='index').set_table_styles([df_header_styles])
-    
-    
-    #df.to_html('table.html',index=False,col_space=20)
 
-    #turn  df into html
-    styled_df.to_html('table.html',header=False,index=False,col_space=20,)
-    
+    # style the dataframe
+
+    properties = {"border": "4px solid black", "color": "black",
+                  "font-size": "16px", 'text-align': 'center', 'align': 'center'}
+    df_header_styles = {
+        'selector': 'th:not(.index_name)',
+        'props': [('border', '5px,solid,black'), ('background-color', 'green'), ('padding', 'auto')]
+    }
+    styled_df = df.style.set_properties(
+        **properties).hide(axis='index').set_table_styles([df_header_styles])
+
+    # df.to_html('table.html',index=False,col_space=20)
+
+    # turn  df into html
+    styled_df.to_html('table.html', header=False, index=False, col_space=20,)
+
     css = """
         table {
           margin:auto,auto;
         }
     """
 
-    
-
-
     # create pdf out of html file
-    pdfkit.from_file('table.html','table.pdf',)
+    pdfkit.from_file('table.html', 'table.pdf',)
 
-#orders
+# orders
+
+
 def download_orders_file():
-    today=datetime.date.today().strftime(' %d-%m-%Y')
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
+    today = datetime.date.today().strftime(' %d-%m-%Y')
 
     os.chdir(f'../orders-{today}')
     order_url = 'https://robotsparebinindustries.com/orders.csv'
@@ -275,26 +377,55 @@ def download_orders_file():
 
 
 def get_order_page(driver=driver):
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
     try:
-        prder_robot=driver.find_element(By.LINK_TEXT, 'Order your robot!').click()
+        prder_robot = driver.find_element(
+            By.LINK_TEXT, 'Order your robot!').click()
 
         # order_page = driver.find_element(By.XPATH, '//*[@id="root"]/header/div/ul/li[2]/a')
         # order_page.click()
         driver.implicitly_wait(20)
         alert_button = driver.find_element(
-        By.XPATH, '//*[@id="root"]/div/div[2]/div/div/div/div/div/button[1]')
-    
+            By.XPATH, '//*[@id="root"]/div/div[2]/div/div/div/div/div/button[1]')
 
         alert_button.click()
     except selenium.common.exceptions.ElementClickInterceptedException:
-        ok_button=driver.find_element(By.XPATH,'//*[@id="root"]/div/div[2]/div/div/div/div/div/button[1]')
-        wait=WebDriverWait(driver, 20).until(EC.element_to_be_clickable(ok_button)).click()
-        
-   
-       
+        ok_button = driver.find_element(
+            By.XPATH, '//*[@id="root"]/div/div[2]/div/div/div/div/div/button[1]')
+        wait = WebDriverWait(driver, 20).until(
+            EC.element_to_be_clickable(ok_button)).click()
 
 
 def create_orders():
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
 
     # get the dataframe from the function  to be used
     csv_df = download_orders_file()
@@ -306,7 +437,8 @@ def create_orders():
         select_head = Select(head_field)
 
         # body field
-        body_fields = driver.find_elements(By.CSS_SELECTOR, '.form-check-input')
+        body_fields = driver.find_elements(
+            By.CSS_SELECTOR, '.form-check-input')
 
         # legs field
         legs_field = driver.find_element(
@@ -314,10 +446,9 @@ def create_orders():
 
         # address
         address_field = driver.find_element(By.ID, 'address')
-    
+
         # fill out the order
-    
-  
+
         for head, body_type, legs, address in zip(csv_df['Head'], csv_df['Body'], csv_df['Legs'], csv_df['Legs']):
             select_head.select_by_value(str(head))
             for field in body_fields:
@@ -327,96 +458,172 @@ def create_orders():
 
             legs_field.send_keys(legs)
             address_field.send_keys(address)
-        
-            wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])      
-        
+
+            wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+                                 StaleElementReferenceException, NoSuchElementException])
+
             order_screenshot()
             order_pdf()
-            order_another=driver.find_element(By.ID, 'order-another')
+            order_another = driver.find_element(By.ID, 'order-another')
             order_another.click()
-            get_order_page()  
-       
-            
+            get_order_page()
+
     except StaleElementReferenceException:
-        pass
-    
+
+        create_orders()
+
     finally:
         create_zip()
 
 
 def order_screenshot(driver=driver):
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
     
-   #robot preview
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
+
+   # robot preview
     preview_button = driver.find_element(By.ID, 'preview')
-    #order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
-    wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
-    preview_button.click() 
-    wait = WebDriverWait(driver, timeout=30, poll_frequency=5, ignored_exceptions=[StaleElementReferenceException, NoSuchElementException])
-    robots = driver.find_element(
-            By.XPATH, "//div[@id='robot-preview']")
+    # order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
     wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-            StaleElementReferenceException, NoSuchElementException]) 
-    
+                         StaleElementReferenceException, NoSuchElementException])
+    preview_button.click()
+    wait = WebDriverWait(driver, timeout=30, poll_frequency=5, ignored_exceptions=[
+                         StaleElementReferenceException, NoSuchElementException])
+    robots = driver.find_element(
+        By.XPATH, "//div[@id='robot-preview']")
+    wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
+        StaleElementReferenceException, NoSuchElementException])
+
     robots.screenshot(f'robot_screenshot.png')
     wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-           StaleElementReferenceException, NoSuchElementException])
-    #order receipt
+        StaleElementReferenceException, NoSuchElementException])
+    # order receipt
     order_button = driver.find_element(By.XPATH, '//*[@id="order"]')
     wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-           StaleElementReferenceException, NoSuchElementException])
+        StaleElementReferenceException, NoSuchElementException])
     order_button.click()
-    receipt = driver.find_element(By.ID, 'receipt') 
+
+    receipt = driver.find_element(By.ID, 'receipt')
     wait = WebDriverWait(driver, timeout=10, poll_frequency=5, ignored_exceptions=[
-           StaleElementReferenceException, NoSuchElementException])       
-    receipt_screenshot = receipt.screenshot(f'receipt_pic.png') 
+        StaleElementReferenceException, NoSuchElementException])
+    receipt_screenshot = receipt.screenshot(f'receipt_pic.png')
 
 
 def order_pdf():
-    today=datetime.date.today().strftime(' %d-%m-%Y')
-    pdf_file='order.pdf'
-        
-    #filepaths for both pictures
-    image_filepath1=f'../orders-{today}/receipt_pic.png'
-    image_filepath2=f'../orders-{today}/robot_screenshot.png'
-    #opening both pictures
-    image_1=Image.open(image_filepath1)
-    image_2=Image.open(image_filepath2)
-    #calculating the pdf with and height based on images  height
-    pdf_width=max(image_1.width,image_2.width)
-    pdf_height=image_1.height+image_2.height
-        
-    #create blank picture
-    pdf=Image.new('RGB',(pdf_width,pdf_height),(255,255,255))
-    #pasting both images one after the other stacked vertically
-    pdf.paste(image_1,(0,0))
-    pdf.paste(image_2,(0,image_1.height))
-    #saving the canvas as pdf
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
+    today = datetime.date.today().strftime(' %d-%m-%Y')
+    pdf_file = 'order.pdf'
+
+    # filepaths for both pictures
+    image_filepath1 = f'../orders-{today}/receipt_pic.png'
+    image_filepath2 = f'../orders-{today}/robot_screenshot.png'
+    # opening both pictures
+    image_1 = Image.open(image_filepath1)
+    image_2 = Image.open(image_filepath2)
+    # calculating the pdf with and height based on images  height
+    pdf_width = max(image_1.width, image_2.width)
+    pdf_height = image_1.height+image_2.height
+
+    # create blank picture
+    pdf = Image.new('RGB', (pdf_width, pdf_height), (255, 255, 255))
+    # pasting both images one after the other stacked vertically
+    pdf.paste(image_1, (0, 0))
+    pdf.paste(image_2, (0, image_1.height))
+    # saving the canvas as pdf
     pdf.save(pdf_file, save_all=True)
 
 
 def create_zip():
-    today=datetime.date.today().strftime(' %d-%m-%Y')
-    filename=os.path.expanduser(os.path.join(os.pardir,'zipped_orders'))
-    format='zip'
-    directory= f"{os.path.join(os.pardir,f'orders-{today}')}"
-    shutil.make_archive(filename, format,directory)
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
+    
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
+    today = datetime.date.today().strftime(' %d-%m-%Y')
+    filename = os.path.expanduser(os.path.join(os.pardir, 'zipped_orders'))
+    format = 'zip'
+    directory = f"{os.path.join(os.pardir,f'orders-{today}')}"
+    shutil.make_archive(filename, format, directory)
     notification.notify(title='order completed',
-         message='excellent', timeout=10)
+                        message='excellent', timeout=10)
+
+
+def send_email(sender_email,):
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
     
-def send_email():
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
     pass
-    
+
 
 def log_out(driver=driver):
+    """
+    Signup
+
+    This path operation register a user in the app
+    Parameters: 
+    - Request body parameter
+            - user: UserRegister
     
+    Returns a json with the basic user information: 
+        - user_id: UUID
+        - email: Emailstr
+        - first_name: str
+        - last_name: str
+        - birth_date: datetime
+    """
+
     notification.notify(title='Bye',
-         message='it\'s time to say goodbye', timeout=10)
+                        message='it\'s time to say goodbye', timeout=10)
     driver.quit()
-   
-   
-   
-   
-   
+
 
 sign_in()
 create_directory()
@@ -429,15 +636,3 @@ create_orders()
 log_out()
 
 
-
-
-
-
-
-
-
-
-
-"""
-https://robotsparebinindustries.com/#/robot-order
-"""
