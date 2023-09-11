@@ -1,4 +1,8 @@
-def enter_sales(driver=driver,):
+import pandas as pd
+import
+
+
+def enter_sales(driver:Webdriver=driver,):
     """
     Signup
 
