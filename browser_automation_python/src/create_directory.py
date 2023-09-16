@@ -1,6 +1,6 @@
 import os
 import datetime
-from speaker import UbuntuTTS,commands
+from speaker import tts,commands
 
 
 def create_directory():
@@ -18,30 +18,33 @@ def create_directory():
         
     """
 
-    # establishh today's date
+    # establish today's date
     today = datetime.date.today().strftime(' %d-%m-%Y')
     tts.speak(commands['directories-created'])
-
     try:
         # input
+        
         sales_data = os.path.join(os.pardir, 'data', f'sales{today}')
         orders_data = os.path.join(os.pardir, 'data', f'orders{today}')
 
         # create the data directories
-        os.mkdir(f'{sales_data}')
-        os.mkdir(f'{orders_data}')
+       
+        os.makedirs(f'{sales_data}')
+        os.makedirs(f'{orders_data}')
         # create the output  directories
+        
         output_sales = os.path.join(os.pardir, 'output', f'orders{today}')
 
         output_orders=os.path.expanduser(os.path.join(os.pardir,'output',f'sales{today}'))
-        os.mkdir(f'{output_sales}')
-        os.mkdir(f'{output_orders}')
+        os.makedirs(f'{output_sales}')
+        os.makedirs(f'{output_orders}')
 
-        os.chdir(f'{sales}')
+        os.chdir(f'{sales_data}')
     except FileExistsError:
-        os.chdir(f'{sales}')
+        os.chdir(f'{sales_data}')
     finally:
         tts.speak(commands['folder-success'])
-        return orders_data,sales_data, output_sales,output_orders
+    return orders_data,sales_data, output_sales,output_orders
+    
 
 

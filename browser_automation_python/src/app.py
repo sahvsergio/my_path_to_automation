@@ -1,4 +1,4 @@
-import os
+
 
 import random
 import shutil
@@ -95,9 +95,7 @@ driver.maximize_window()
 
 
 if __name__=='__main__':
-    try:
-        tts.speak('file-started')
-        create_directory()
-    except:
-        'it didnt work'
+    tts.speak('file-started')
+    create_directory()
+ 
     
