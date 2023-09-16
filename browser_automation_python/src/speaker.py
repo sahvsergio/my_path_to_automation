@@ -3,7 +3,9 @@ import plyer
 from plyer.facades import TTS
 
 commands={
-    'file-started':'the bot was started'
+    'file-started':'the bot was started',
+    'directories-created':'the folders are being created',
+    'folder-success':'the folders were created successfully'
 }
 
 

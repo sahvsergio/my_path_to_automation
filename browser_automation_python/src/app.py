@@ -43,7 +43,7 @@ from PIL import Image
 
 #import from files
 from speaker import tts,commands
-
+from create_directory import create_directory
 
 
 
@@ -97,5 +97,7 @@ driver.maximize_window()
 if __name__=='__main__':
     try:
         tts.speak('file-started')
+        create_directory()
     except:
         'it didnt work'
+    
