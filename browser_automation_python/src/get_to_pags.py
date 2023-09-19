@@ -1,4 +1,27 @@
-def sign_in(driver: selenium.webdriver.chrome.webdriver.WebDriver = driver):
+import os
+import selenium
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+""" 
+options = Options()
+prefs = {"credentials_enable_service": False,
+         "profile.password_manager_enabled": False}
+
+# remove the message of it being controlled by automation software
+options.add_experimental_option('excludeSwitches', ['enable-automation'])
+options.add_experimental_option('detach', True)
+options.add_experimental_option('prefs', prefs)
+
+
+# creating an  instance of the webdriver
+driver = webdriver.Chrome(options=options)
+print(type(driver))
+driver.maximize_window() """
+
+
+
+def sign_in(driver: selenium.webdriver.chrome.webdriver.WebDriver = webdriver):
     """
         Signup
 
@@ -13,7 +36,22 @@ def sign_in(driver: selenium.webdriver.chrome.webdriver.WebDriver = driver):
         - first_name: str
         - last_name: str
         - birth_date: datetime
+        
     """
+    options = Options()
+    prefs = {"credentials_enable_service": False,
+         "profile.password_manager_enabled": False}
+
+# remove the message of it being controlled by automation software
+    options.add_experimental_option('excludeSwitches', ['enable-automation'])
+    options.add_experimental_option('detach', True)
+    options.add_experimental_option('prefs', prefs)
+
+
+# creating an  instance of the webdriver
+    driver = webdriver.Chrome(options=options)
+    print(type(driver))
+    driver.maximize_window()
 
     # opening the website
     driver.get('https://robotsparebinindustries.com/')
@@ -38,9 +76,10 @@ def sign_in(driver: selenium.webdriver.chrome.webdriver.WebDriver = driver):
     button_click = login_button.click()
 
     options.add_argument('--disable-save-password-bubble')
+    return driver
 
 
-def get_order_page(driver=driver):
+def get_order_page(driver=webdriver):
     """
     Signup
 
@@ -74,7 +113,7 @@ def get_order_page(driver=driver):
             EC.element_to_be_clickable(ok_button)).click()
 
 
-def log_out(driver=driver):
+def log_out(driver=webdriver):
     """
     Signup
 

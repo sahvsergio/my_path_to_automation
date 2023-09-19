@@ -1,4 +1,4 @@
-def send_email(sender_email,):
+def send_email(sender_email,recipient, email):
     """
     Signup
 
@@ -15,3 +15,5 @@ def send_email(sender_email,):
         - birth_date: datetime
     """
     pass
+
+
