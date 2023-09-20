@@ -2,8 +2,16 @@ import os
 import datetime
 from speaker import tts,commands
 
+today = datetime.date.today().strftime(' %d-%m-%Y')
+sales_data = os.path.join(os.pardir, 'data', f'sales{today}')
+orders_data = os.path.join(os.pardir, 'data', f'orders{today}')
+        #output paths
+output_sales = os.path.join(os.pardir, 'output', f'orders{today}')
 
-def create_directory():
+output_orders=os.path.expanduser(os.path.join(os.pardir,'output',f'sales{today}'))
+
+
+def create_directory(sales_data=sales_data,orders_data=orders_data,output_sales=output_sales, output_orders=output_orders):
     """
     create_directory
 
@@ -19,17 +27,12 @@ def create_directory():
     """
 
     # establish today's date
-    today = datetime.date.today().strftime(' %d-%m-%Y')
+  
     tts.speak(commands['directories-created'])
     try:
         # input paths
         
-        sales_data = os.path.join(os.pardir, 'data', f'sales{today}')
-        orders_data = os.path.join(os.pardir, 'data', f'orders{today}')
-        #output paths
-        output_sales = os.path.join(os.pardir, 'output', f'orders{today}')
-
-        output_orders=os.path.expanduser(os.path.join(os.pardir,'output',f'sales{today}'))
+      
 
         # create the data directories
        
@@ -47,6 +50,13 @@ def create_directory():
     finally:
         tts.speak(commands['folder-success'])
     return orders_data,sales_data, output_sales,output_orders
+
+
+
+
+
+
+
 
 
 

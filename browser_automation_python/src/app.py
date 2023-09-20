@@ -44,6 +44,7 @@ from PIL import Image
 #import from files
 from speaker import tts,commands
 from create_directory import create_directory
+from download_files import download_sales_file, download_orders_file
 from get_to_pags import sign_in
 
 
@@ -76,9 +77,11 @@ driver.maximize_window()
 
 if __name__=='__main__':
     tts.speak('file-started')
-    orders_data,sales_data, output_sales,output_orders=create_directory()
-    sign_in()
+    create_directory()
     
+  
+    download_sales_file()
+    download_orders_file()
         
     
     
